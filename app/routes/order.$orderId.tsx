@@ -6,7 +6,7 @@ import { getOrder } from '~/services/apiRestaurant';
 import OrderItem from '~/features/order/order-item';
 import UpdateOrder from '~/features/order/update-order';
 import { CartItem as OrderType } from '~/types/order';
-import { type LoaderFunctionArgs } from '@remix-run/node';
+import { type ClientLoaderFunctionArgs } from '@remix-run/node';
 export * as ErrorBoundary from '~/components/error-boundary';
 
 function Order() {
@@ -92,7 +92,7 @@ function Order() {
   );
 }
 
-export async function clientLoader({ params }: LoaderFunctionArgs) {
+export async function clientLoader({ params }: ClientLoaderFunctionArgs) {
   if (!params?.orderId) return {};
 
   return await getOrder(params.orderId);
