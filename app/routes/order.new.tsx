@@ -1,7 +1,10 @@
+import { useCallback, useEffect } from 'react';
 import {
+  BlockerFunction,
   Form,
   redirect,
   useActionData,
+  useBlocker,
   useNavigation,
   type ClientActionFunctionArgs,
 } from '@remix-run/react';
@@ -22,6 +25,7 @@ import {
 } from '~/features/cart/cartSlice';
 import { fetchAddress } from '~/features/user/userSlice';
 import { formatCurrency } from '~/utils/helpers';
+import NavigationDialog from '~/components/naviation-dialog';
 
 // https://uibakery.io/regex-library/phone-number
 const isValidPhone = (str: string) =>
@@ -106,10 +110,25 @@ function CreateOrder() {
     },
   });
 
+  const shouldBlock = useCallback<BlockerFunction>(
+    ({ currentLocation, nextLocation }) =>
+      form.dirty && currentLocation.pathname !== nextLocation.pathname,
+    [form.dirty]
+  );
+  const blocker = useBlocker(shouldBlock);
+
   const cart = useAppSelector(getCart);
   const totalCartPrice = useAppSelector(getTotalCartPrice);
   const priorityPrice = form.value?.priority ? totalCartPrice * 0.2 : 0;
   const totalPrice = totalCartPrice + priorityPrice;
+
+  useEffect(() => {
+    if (blocker.state === 'blocked' && !form.dirty) {
+      blocker.reset();
+    }
+
+    return () => blocker.reset?.();
+  }, [blocker, form.dirty]);
 
   if (!cart.length) return <EmptyCart />;
 
@@ -225,10 +244,15 @@ function CreateOrder() {
               : `Order now from ${formatCurrency(totalPrice)}`}
           </Button>
         </div>
+
+        {blocker.state === 'blocked' ? (
+          <NavigationDialog blocker={blocker} />
+        ) : null}
       </Form>
     </div>
   );
 }
+
 export function ErrorBoundary() {
   return <GeneralErrorBoundary />;
 }

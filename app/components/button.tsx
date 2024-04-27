@@ -35,7 +35,7 @@ export default function Button({
     return (
       <button
         disabled={disabled}
-        className={type && styles[type]}
+        className={type ? styles[type] : base}
         onClick={onClick}
       >
         {children}
