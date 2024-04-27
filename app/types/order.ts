@@ -26,7 +26,6 @@ export type Order = {
   phone: string;
   position: string;
   address: string;
-  status: string;
   priority: boolean;
   cart: CartItem[];
 };
