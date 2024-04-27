@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import {
+  ClientActionFunctionArgs,
   redirect,
   useFetcher,
   useLoaderData,
@@ -7,16 +8,34 @@ import {
 } from '@remix-run/react';
 
 import { calcMinutesLeft, formatCurrency, formatDate } from '~/utils/helpers';
-import { getOrder } from '~/services/apiRestaurant';
+import { getOrder, updateOrder } from '~/services/apiRestaurant';
 import OrderItem from '~/features/order/order-item';
-import UpdateOrder from '~/features/order/update-order';
-import { CartItem as OrderType } from '~/types/order';
+import { CartItem as CartItemType } from '~/types/order';
 import { GeneralErrorBoundary } from '~/components/general-error-boundary';
+import Button from '~/components/button';
+
+export async function clientAction({ params }: ClientActionFunctionArgs) {
+  if (!params?.orderId) return null;
+
+  const updateData = { priority: true };
+  await updateOrder(params.orderId, updateData);
+  return null;
+}
+
+export async function clientLoader({ params }: ClientLoaderFunctionArgs) {
+  if (!params?.orderId) {
+    redirect('/menu');
+    return;
+  }
+
+  return await getOrder(params.orderId);
+}
 
 function Order() {
-  const order = useLoaderData();
-
+  const order = useLoaderData<typeof clientLoader>();
   const fetcher = useFetcher();
+
+  const isMakingPriority = fetcher.state === 'submitting';
 
   useEffect(() => {
     if (!fetcher.data && fetcher.state === 'idle') fetcher.load('/menu');
@@ -63,7 +82,7 @@ function Order() {
       </div>
 
       <ul className="divide-y divide-stone-200 border-b border-t">
-        {cart.map((item: OrderType) => (
+        {cart.map((item: CartItemType) => (
           <OrderItem
             item={item}
             isLoadingIngredients={fetcher.state === 'loading'}
@@ -91,15 +110,15 @@ function Order() {
         </p>
       </div>
 
-      {!priority && <UpdateOrder order={order} />}
+      {!priority && (
+        <fetcher.Form method="PATCH" className="text-end">
+          <Button type="primary" disabled={isMakingPriority}>
+            {isMakingPriority ? 'Making Priority...' : 'Make Priority'}
+          </Button>
+        </fetcher.Form>
+      )}
     </div>
   );
-}
-
-export async function clientLoader({ params }: ClientLoaderFunctionArgs) {
-  if (!params?.orderId) return redirect('/menu');
-
-  return await getOrder(params.orderId);
 }
 
 export function ErrorBoundary() {

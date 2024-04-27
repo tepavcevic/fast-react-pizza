@@ -13,7 +13,7 @@ export async function getMenu(): Promise<Product> {
   return data;
 }
 
-export async function getOrder(id: string) {
+export async function getOrder(id: string): Promise<Order> {
   const res = await fetch(`${API_URL}/order/${id}`);
   if (!res.ok) throw Error(`Couldn't find order #${id}`);
 
@@ -40,7 +40,7 @@ export async function createOrder(newOrder: Order): Promise<Product> {
 }
 
 export async function updateOrder(
-  id: number,
+  id: string,
   updateObj: Record<string, unknown>
 ) {
   try {

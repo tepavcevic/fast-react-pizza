@@ -29,16 +29,6 @@ const isValidPhone = (str: string) =>
     str
   );
 
-const CartSchema = z.array(
-  z.object({
-    pizzaId: z.number(),
-    name: z.string(),
-    unitPrice: z.number(),
-    quantity: z.number().min(1),
-    totalPrice: z.number(),
-  })
-);
-
 const OrderSchema = z.object({
   customer: z
     .string({ required_error: 'Please give us your name.' })
@@ -73,13 +63,9 @@ export async function clientAction({ request }: ClientActionFunctionArgs) {
   if (submission.status !== 'success') return submission.reply();
   if (!submission.value) return null;
 
-  const parsedCart = await CartSchema.safeParseAsync(submission.value.cart);
-
-  if (!parsedCart.success) return parsedCart.error;
-
   const order = {
     ...submission.value,
-    cart: parsedCart.data,
+    cart: JSON.parse(submission.value.cart),
     position: submission.value.position ?? '',
     priority: submission.payload?.priority ? true : false,
   };
