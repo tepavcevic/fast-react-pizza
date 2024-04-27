@@ -1,11 +1,12 @@
 import { useSelector } from 'react-redux';
+
 import { formatCurrency } from '~/utils/helpers';
 import DeleteItem from './delete-item';
 import UpdateItemQuantity from './update-item-quantity';
 import { getCurrentQuantityById } from './cartSlice';
-import { CartItem } from '~/types/order';
+import { CartItem as CartItemType } from '~/types/order';
 
-function CartItem({ item }: { item: CartItem }) {
+function CartItem({ item }: { item: CartItemType }) {
   const { pizzaId, name, quantity, totalPrice } = item;
   const currentQuantity = useSelector(getCurrentQuantityById(pizzaId));
 

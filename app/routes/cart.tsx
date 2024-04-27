@@ -1,12 +1,12 @@
-import { useDispatch, useSelector } from 'react-redux';
+import { useAppDispatch, useAppSelector } from '~/hooks/redux';
+import { type MetaFunction } from '@remix-run/node';
+
 import LinkButton from '~/components/link-button';
 import Button from '~/components/button';
 import CartItem from '~/features/cart/cart-item';
 import { clearCart, getCart } from '~/features/cart/cartSlice';
 import EmptyCart from '~/features/cart/empty-cart';
 import { CartItem as CartItemType } from '~/types/order';
-import { type MetaFunction } from '@remix-run/node';
-export * as ErrorBoundary from '~/components/error-boundary';
 
 export const meta: MetaFunction = () => {
   return [
@@ -17,9 +17,9 @@ export const meta: MetaFunction = () => {
 };
 
 function Cart() {
-  const dispatch = useDispatch();
-  const username = useSelector((state) => state.user.username);
-  const cart = useSelector(getCart);
+  const dispatch = useAppDispatch();
+  const username = useAppSelector((state) => state.user.username);
+  const cart = useAppSelector(getCart);
 
   const handleClearCart = () => dispatch(clearCart());
 

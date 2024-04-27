@@ -1,13 +1,17 @@
 import { useEffect } from 'react';
-import { useFetcher, useLoaderData } from '@remix-run/react';
+import {
+  redirect,
+  useFetcher,
+  useLoaderData,
+  type ClientLoaderFunctionArgs,
+} from '@remix-run/react';
 
 import { calcMinutesLeft, formatCurrency, formatDate } from '~/utils/helpers';
 import { getOrder } from '~/services/apiRestaurant';
 import OrderItem from '~/features/order/order-item';
 import UpdateOrder from '~/features/order/update-order';
 import { CartItem as OrderType } from '~/types/order';
-import { type ClientLoaderFunctionArgs } from '@remix-run/node';
-export * as ErrorBoundary from '~/components/error-boundary';
+import { GeneralErrorBoundary } from '~/components/general-error-boundary';
 
 function Order() {
   const order = useLoaderData();
@@ -93,9 +97,19 @@ function Order() {
 }
 
 export async function clientLoader({ params }: ClientLoaderFunctionArgs) {
-  if (!params?.orderId) return {};
+  if (!params?.orderId) return redirect('/menu');
 
   return await getOrder(params.orderId);
+}
+
+export function ErrorBoundary() {
+  return (
+    <GeneralErrorBoundary
+      statusHandlers={{
+        404: ({ params }) => <p>Order {params.orderId} not found</p>,
+      }}
+    />
+  );
 }
 
 export default Order;

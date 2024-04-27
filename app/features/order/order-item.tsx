@@ -1,6 +1,15 @@
-import { formatCurrency } from '../../utils/helpers';
+import { CartItem } from '~/types/order';
+import { formatCurrency } from '~/utils/helpers';
 
-function OrderItem({ item, isLoadingIngredients, ingredients }) {
+function OrderItem({
+  item,
+  isLoadingIngredients,
+  ingredients,
+}: {
+  item: CartItem;
+  isLoadingIngredients: boolean;
+  ingredients?: string[];
+}) {
   const { quantity, name, totalPrice } = item;
 
   return (

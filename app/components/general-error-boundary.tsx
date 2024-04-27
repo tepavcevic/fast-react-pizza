@@ -5,6 +5,8 @@ import {
 } from '@remix-run/react';
 import { type ErrorResponse } from '@remix-run/router';
 
+import { getErrorMessage } from '~/utils/helpers';
+
 type StatusHandler = (info: {
   error: ErrorResponse;
   params: Record<string, string | undefined>;
@@ -17,6 +19,7 @@ export function GeneralErrorBoundary({
     </p>
   ),
   statusHandlers,
+  unexpectedErrorHandler = (error) => <p>{getErrorMessage(error)}</p>,
 }: {
   defaultStatusHandler?: StatusHandler;
   statusHandlers?: Record<number, StatusHandler>;
@@ -36,7 +39,7 @@ export function GeneralErrorBoundary({
             error,
             params,
           })
-        : null}
+        : unexpectedErrorHandler(error)}
     </div>
   );
 }

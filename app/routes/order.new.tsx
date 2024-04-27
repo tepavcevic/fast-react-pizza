@@ -6,11 +6,12 @@ import {
   useNavigation,
   type ClientActionFunctionArgs,
 } from '@remix-run/react';
-import { useDispatch, useSelector } from 'react-redux';
 
+import { useAppDispatch, useAppSelector } from '~/hooks/redux';
 import store from '~/store/store';
 import { createOrder } from '~/services/apiRestaurant';
 import Button from '~/components/button';
+import { GeneralErrorBoundary } from '~/components/general-error-boundary';
 import EmptyCart from '~/features/cart/empty-cart';
 import {
   clearCart,
@@ -19,6 +20,7 @@ import {
 } from '~/features/cart/cartSlice';
 import { fetchAddress } from '~/features/user/userSlice';
 import { formatCurrency } from '~/utils/helpers';
+import { CartItem } from '~/types/order';
 
 // https://uibakery.io/regex-library/phone-number
 const isValidPhone = (str: string) =>
@@ -34,17 +36,17 @@ function CreateOrder() {
     position,
     address,
     error: errorAddress,
-  } = useSelector((state) => state.user);
+  } = useAppSelector((state) => state.user);
   const isLoadingAddress = addressStatus === 'loading';
 
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const navigation = useNavigation();
   const isSubmitting = navigation.state === 'submitting';
 
   const formErrors = useActionData();
 
-  const cart = useSelector(getCart);
-  const totalCartPrice = useSelector(getTotalCartPrice);
+  const cart = useAppSelector(getCart);
+  const totalCartPrice = useAppSelector(getTotalCartPrice);
   const priorityPrice = withPriority ? totalCartPrice * 0.2 : 0;
   const totalPrice = totalCartPrice + priorityPrice;
 
@@ -187,6 +189,10 @@ export async function clientAction({ request }: ClientActionFunctionArgs) {
   store.dispatch(clearCart());
 
   return redirect(`/order/${newOrder.id}`);
+}
+
+export function ErrorBoundary() {
+  return <GeneralErrorBoundary />;
 }
 
 export default CreateOrder;

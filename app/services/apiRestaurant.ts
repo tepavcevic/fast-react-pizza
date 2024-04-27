@@ -23,7 +23,6 @@ export async function getOrder(id: string) {
 
 export async function createOrder(newOrder: Order): Promise<Product> {
   try {
-    console.log(newOrder);
     const res = await fetch(`${API_URL}/order`, {
       method: 'POST',
       body: JSON.stringify(newOrder),
