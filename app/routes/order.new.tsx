@@ -2,6 +2,7 @@ import { useCallback, useEffect } from 'react';
 import {
   BlockerFunction,
   Form,
+  MetaFunction,
   redirect,
   useActionData,
   useBlocker,
@@ -25,7 +26,8 @@ import {
 } from '~/features/cart/cartSlice';
 import { fetchAddress } from '~/features/user/userSlice';
 import { formatCurrency } from '~/utils/helpers';
-import NavigationDialog from '~/components/naviation-dialog';
+import NavigationDialog from '~/components/navigation-dialog';
+import Loader from '~/components/loader';
 
 // https://uibakery.io/regex-library/phone-number
 const isValidPhone = (str: string) =>
@@ -62,7 +64,6 @@ export async function clientAction({ request }: ClientActionFunctionArgs) {
     schema: OrderSchema,
     async: true,
   });
-  console.log(submission);
 
   if (submission.status !== 'success') return submission.reply();
   if (!submission.value) return null;
@@ -74,8 +75,6 @@ export async function clientAction({ request }: ClientActionFunctionArgs) {
     priority: submission.payload?.priority ? true : false,
   };
 
-  console.log(order);
-
   // If everything is okay, create new order and redirect
   const newOrder = await createOrder(order);
 
@@ -83,6 +82,10 @@ export async function clientAction({ request }: ClientActionFunctionArgs) {
 
   return redirect(`/order/${newOrder.id}`);
 }
+
+export const meta: MetaFunction = () => {
+  return [{ title: 'Order | Fast React Pizza Co.' }];
+};
 
 function CreateOrder() {
   const {
@@ -130,7 +133,9 @@ function CreateOrder() {
     return () => blocker.reset?.();
   }, [blocker, form.dirty]);
 
-  if (!cart.length) return <EmptyCart />;
+  if (navigation.state === 'loading') return <Loader />;
+
+  if (!cart.length && navigation.state === 'idle') return <EmptyCart />;
 
   return (
     <div className="px-4 py-6">
@@ -149,6 +154,7 @@ function CreateOrder() {
               {...getInputProps(fields.customer, { type: 'text' })}
               defaultValue={username}
               className="input grow"
+              disabled={isSubmitting}
               required
             />
             {fields.customer.errors && (
@@ -167,6 +173,7 @@ function CreateOrder() {
             <input
               {...getInputProps(fields.phone, { type: 'tel' })}
               className="input w-full"
+              disabled={isSubmitting}
               required
             />
             {fields.phone.errors && (
@@ -186,7 +193,7 @@ function CreateOrder() {
               {...getInputProps(fields.address, { type: 'text' })}
               className="input w-full"
               defaultValue={address}
-              disabled={isLoadingAddress}
+              disabled={isLoadingAddress || isSubmitting}
               required
             />
             {addressStatus === 'error' && (
@@ -202,7 +209,7 @@ function CreateOrder() {
                 onClick={() => {
                   dispatch(fetchAddress());
                 }}
-                disabled={isLoadingAddress}
+                disabled={isLoadingAddress || isSubmitting}
               >
                 Get position
               </Button>
@@ -214,6 +221,7 @@ function CreateOrder() {
           <input
             className="h-6 w-6 accent-yellow-400 focus:outline-none focus:ring focus:ring-yellow-400 focus:ring-offset-2"
             {...getInputProps(fields.priority, { type: 'checkbox' })}
+            disabled={isSubmitting}
           />
           <label htmlFor={fields.priority.id} className="font-medium">
             Want to yo give your order priority?

@@ -1,14 +1,10 @@
 import { Links, Meta, Scripts, ScrollRestoration } from '@remix-run/react';
-import type { LinksFunction, MetaFunction } from '@remix-run/node';
+import type { MetaFunction } from '@remix-run/node';
 import { Provider } from 'react-redux';
-import stylesheet from '~/styles/tailwind.css?url';
+import '~/styles/tailwind.css';
 import Loader from '~/components/loader';
 import AppLayout from '~/components/app-layout';
 import store from './store/store';
-
-export const links: LinksFunction = () => [
-  { rel: 'stylesheet', href: stylesheet },
-];
 
 export const meta: MetaFunction = () => {
   return [

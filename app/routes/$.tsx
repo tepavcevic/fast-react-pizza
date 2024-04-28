@@ -1,4 +1,5 @@
 import { Link, useLocation } from '@remix-run/react';
+
 import { GeneralErrorBoundary } from '~/components/general-error-boundary';
 
 export async function clientLoader() {
