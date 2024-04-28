@@ -1,20 +1,14 @@
-import {
-  Links,
-  Meta,
-  Scripts,
-  ScrollRestoration,
-  useNavigation,
-} from '@remix-run/react';
-import type { MetaFunction } from '@remix-run/node';
+import { Links, Meta, Scripts, ScrollRestoration } from '@remix-run/react';
+import type { LinksFunction, MetaFunction } from '@remix-run/node';
 import { Provider } from 'react-redux';
-import '~/styles/tailwind.css';
+import stylesheet from '~/styles/tailwind.css?url';
 import Loader from '~/components/loader';
 import AppLayout from '~/components/app-layout';
 import store from './store/store';
 
-// export const links: LinksFunction = () => [
-//   { rel: 'stylesheet', href: stylesheet },
-// ];
+export const links: LinksFunction = () => [
+  { rel: 'stylesheet', href: stylesheet },
+];
 
 export const meta: MetaFunction = () => {
   return [
@@ -25,8 +19,6 @@ export const meta: MetaFunction = () => {
 };
 
 export function Layout({ children }: { children: React.ReactNode }) {
-  const navigation = useNavigation();
-
   return (
     <html lang="en">
       <head>
@@ -40,7 +32,6 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body className="bg-stone-100 text-stone-700">
-        {navigation.state === 'loading' ? <Loader /> : children}
         {children}
         <ScrollRestoration />
         <Scripts />
