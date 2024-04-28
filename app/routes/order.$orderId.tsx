@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import {
   ClientActionFunctionArgs,
+  MetaFunction,
   redirect,
   useFetcher,
   useLoaderData,
@@ -31,9 +32,21 @@ export async function clientLoader({ params }: ClientLoaderFunctionArgs) {
   return await getOrder(params.orderId);
 }
 
+export const meta: MetaFunction = ({ params }) => {
+  return [
+    {
+      title: `Order #${params.orderId} | Fast React Pizza Co.`,
+    },
+  ];
+};
+
 function Order() {
   const order = useLoaderData<typeof clientLoader>();
   const fetcher = useFetcher();
+
+  const priority = fetcher.formData
+    ? fetcher.formData.get('priority') === 'true'
+    : order.priority;
 
   const isMakingPriority = fetcher.state === 'submitting';
 
@@ -42,15 +55,8 @@ function Order() {
   }, [fetcher]);
 
   // Everyone can search for all orders, so for privacy reasons we're gonna gonna exclude names or address, these are only for the restaurant staff
-  const {
-    id,
-    status,
-    priority,
-    priorityPrice,
-    orderPrice,
-    estimatedDelivery,
-    cart,
-  } = order;
+  const { id, status, priorityPrice, orderPrice, estimatedDelivery, cart } =
+    order;
   const deliveryIn = calcMinutesLeft(estimatedDelivery);
 
   return (
@@ -112,6 +118,7 @@ function Order() {
 
       {!priority && (
         <fetcher.Form method="PATCH" className="text-end">
+          <input type="hidden" name="priority" value="true" />
           <Button type="primary" disabled={isMakingPriority}>
             {isMakingPriority ? 'Making Priority...' : 'Make Priority'}
           </Button>
