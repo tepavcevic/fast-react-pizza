@@ -45,7 +45,7 @@ function MenuItem({ pizza }: { pizza: Product }) {
             </p>
           )}
 
-          {!soldOut && (
+          {!soldOut && isInCart && (
             <div className="flex items-center gap-3 sm:gap-8">
               <UpdateItemQuantity id={id} currentQuantity={currentQuantity} />
               <DeleteItem id={id} />
