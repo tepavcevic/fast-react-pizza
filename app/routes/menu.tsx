@@ -14,7 +14,7 @@ export const meta: MetaFunction = () => {
 };
 
 function Menu() {
-  const menu = useLoaderData<typeof clientLoader>();
+  const menu = useLoaderData() as Awaited<ReturnType<typeof clientLoader>>;
 
   return (
     <ul className="divide-y divide-stone-200 px-2">

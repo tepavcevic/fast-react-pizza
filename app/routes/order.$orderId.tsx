@@ -25,8 +25,7 @@ export async function clientAction({ params }: ClientActionFunctionArgs) {
 
 export async function clientLoader({ params }: ClientLoaderFunctionArgs) {
   if (!params?.orderId) {
-    redirect('/menu');
-    return;
+    throw redirect('/menu');
   }
 
   return await getOrder(params.orderId);
@@ -41,7 +40,7 @@ export const meta: MetaFunction = ({ params }) => {
 };
 
 function Order() {
-  const order = useLoaderData<typeof clientLoader>();
+  const order = useLoaderData() as Awaited<ReturnType<typeof clientLoader>>;
   const fetcher = useFetcher();
 
   const priority = fetcher.formData
